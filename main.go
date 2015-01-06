@@ -45,6 +45,14 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func hedgeFundsHandler(w http.ResponseWriter, r *http.Request) {
+	balances := getBalances()
+
+	for name, dollars := range balances {
+		fmt.Fprintf(w, fmt.Sprintf("hedge fund %s has $%d!\n\n", name, dollars))
+	}
+}
+
+func getBalances() map[string]int {
 	rows, e := db.Query("select name,dollars from hedge_funds;")
 	defer rows.Close()
 
@@ -52,12 +60,33 @@ func hedgeFundsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("failure querying the database: ", e)
 	}
 
+	balances := map[string]int{}
+
 	for rows.Next() {
 		var dollars int
 		var name string
 		rows.Scan(&name, &dollars)
-		fmt.Fprintf(w, fmt.Sprintf("hedge fund %s has $%d!\n\n", name, dollars))
+		balances[name] = dollars
 	}
+
+	return balances
+}
+
+func countTotalDollars(balances map[string]int) int {
+	total := 0
+
+	for _, b := range balances {
+		total += b
+	}
+
+	return total
+}
+
+func transactionHandler(w http.ResponseWriter, r *http.Request) {
+	balances := getBalances()
+	totalDollars := countTotalDollars(balances)
+	fmt.Fprintf(w, fmt.Sprintf("dollars before transacting: $%d", totalDollars))
+	// fmt.Fprintf(w, fmt.Sprintf("done transacting", dollars))
 }
 
 func connectToDb() {
@@ -70,11 +99,12 @@ func connectToDb() {
 	}
 }
 
-func routeHandlers() {
+func registerRouteHandlers() {
 	fmt.Println("registering handlers...")
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/hedge_funds", hedgeFundsHandler)
+	http.HandleFunc("/transaction", transactionHandler)
 	http.HandleFunc("/menu/", menuHandler)
 }
 
@@ -121,6 +151,6 @@ insert into banks (name, dollars) values ('b1', 11111),
 func main() {
 	connectToDb()
 	seedDB()
-	routeHandlers()
+	registerRouteHandlers()
 	startServer()
 }
