@@ -16,6 +16,66 @@ type Page struct {
 	Body  []byte
 }
 
+// TODO better name for (banks and hedge funds)
+type Entity struct {
+	name    string
+	dollars int
+}
+
+type Currency struct {
+	name           string
+	valueInDollars int
+}
+
+type Transaction struct {
+	amount   int
+	currency Currency
+}
+
+type Offer struct {
+	traderTransaction Transaction
+	tradeeTransaction Transaction
+}
+
+// TODO trader/tradee look too similar...
+type Trade struct {
+	trader Entity
+	tradee Entity
+	offer  Offer
+}
+
+type Transactor struct{}
+
+func (transactor Transactor) Execute(trade Trade) error {
+	return nil
+}
+
+func (transactor Transactor) ExecuteAll(trades []Trade) error {
+	for _, trade := range trades {
+		err := transactor.Execute(trade)
+
+		if err != nil {
+			log.Fatal("error in ExecuteAll: ", err)
+		}
+	}
+
+	return nil
+}
+
+func transactionHandler(w http.ResponseWriter, r *http.Request) {
+	balances := getBalances()
+	totalDollars := countTotalDollars(balances)
+	fmt.Fprintf(w, fmt.Sprintf("dollars before transacting: $%d\n\n", totalDollars))
+
+	trades := []Trade{}
+	transactor := Transactor{}
+
+	transactor.ExecuteAll(trades)
+
+	totalDollars = countTotalDollars(balances)
+	fmt.Fprintf(w, fmt.Sprintf("dollars after transacting: $%d", totalDollars))
+}
+
 var db *sql.DB
 var err error
 
@@ -80,13 +140,6 @@ func countTotalDollars(balances map[string]int) int {
 	}
 
 	return total
-}
-
-func transactionHandler(w http.ResponseWriter, r *http.Request) {
-	balances := getBalances()
-	totalDollars := countTotalDollars(balances)
-	fmt.Fprintf(w, fmt.Sprintf("dollars before transacting: $%d", totalDollars))
-	// fmt.Fprintf(w, fmt.Sprintf("done transacting", dollars))
 }
 
 func connectToDb() {
