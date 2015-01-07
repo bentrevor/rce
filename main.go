@@ -71,12 +71,14 @@ type Offer struct {
 type Trade struct {
 	trader Entity
 	tradee Entity
-	offer  Offer
+	Offer  Offer
+	Desc   string
 }
 
 type Transactor struct{}
 
 func (transactor Transactor) Execute(trade Trade) error {
+	fmt.Println(trade.Desc)
 	return nil
 }
 
@@ -92,17 +94,19 @@ func (transactor Transactor) ExecuteAll(trades []Trade) error {
 	return nil
 }
 
-func getEntity(name string, tableName string) Entity {
-	rows, e := db.Query(fmt.Sprintf("select name,dollars,pesos from %s where %s.name = %s;", tableName, tableName, name))
+func getEntity(entityName string, tableName string) Entity {
+	query := fmt.Sprintf("select name,dollars,pesos from %s where %s.name = '%s';", tableName, tableName, entityName)
+	fmt.Println(fmt.Sprintf("\n\nquery: %s\n\n", query))
+	rows, e := db.Query(query)
 	defer rows.Close()
 
 	if e != nil {
 		log.Fatal("failure querying the database: ", e)
 	}
 
-	balances := map[string]int{}
+	balances := getBalances()
 
-	for rows.Next() {
+	for name, balance := range balances {
 		var dollars int
 		var pesos int
 		var name string
@@ -136,7 +140,8 @@ func transactionHandler(w http.ResponseWriter, r *http.Request) {
 	trade := Trade{
 		trader: hf1,
 		tradee: hf2,
-		offer:  offer,
+		Offer:  offer,
+		Desc:   "hf1 === 20 Dollars ===> hf2, hf2 === 10 Pesos ===> hf1",
 	}
 	trades := []Trade{trade}
 	transactor := Transactor{}
@@ -175,8 +180,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func hedgeFundsHandler(w http.ResponseWriter, r *http.Request) {
 	balances := getBalances()
 
-	for name, dollars := range balances {
-		fmt.Fprintf(w, fmt.Sprintf("hedge fund %s has $%d!\n\n", name, dollars))
+	for name, balance := range balances {
+		fmt.Fprintf(w, fmt.Sprintf("hedge fund %s has $%d and %d pesos!\n\n", name, balance[Dollars], balance[Pesos]))
 	}
 }
 
@@ -216,21 +221,24 @@ func hedgeFundHandler(name string) func(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-func getBalances() map[string]int {
-	rows, e := db.Query("select name,dollars from hedge_funds;")
+func getBalances() map[string]map[Currency]int {
+	rows, e := db.Query("select name,dollars,pesos from hedge_funds;")
 	defer rows.Close()
 
 	if e != nil {
 		log.Fatal("failure querying the database: ", e)
 	}
 
-	balances := map[string]int{}
+	balances := map[string]map[Currency]int{}
 
 	for rows.Next() {
-		var dollars int
 		var name string
-		rows.Scan(&name, &dollars)
-		balances[name] = dollars
+		var dollars int
+		var pesos int
+		rows.Scan(&name, &dollars, &pesos)
+
+		balances[name][Dollars] = dollars
+		balances[name][Pesos] = pesos
 	}
 
 	return balances
