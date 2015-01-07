@@ -17,15 +17,45 @@ type Page struct {
 }
 
 // TODO better name for (banks and hedge funds)
-type Entity struct {
-	name    string
-	dollars int
+type Entity interface {
+	TableName() string
 }
 
-type Currency struct {
-	name           string
-	valueInDollars int
+type Bank struct {
+	name    string
+	dollars int
+	pesos   int
 }
+
+type HedgeFund struct {
+	name    string
+	dollars int
+	pesos   int
+}
+
+type Currency string
+
+const (
+	Dollars Currency = "dollars"
+	Pesos   Currency = "pesos"
+)
+
+func (Bank) TableName() string {
+	return "banks"
+}
+
+func (HedgeFund) TableName() string {
+	return "hedge_funds"
+}
+
+// value in Dollars
+var exchangeRates = map[Currency]int{
+	Dollars: 1,
+	Pesos:   2,
+}
+
+var db *sql.DB
+var err error
 
 type Transaction struct {
 	amount   int
@@ -62,12 +92,53 @@ func (transactor Transactor) ExecuteAll(trades []Trade) error {
 	return nil
 }
 
+func getEntity(name string, tableName string) Entity {
+	rows, e := db.Query(fmt.Sprintf("select name,dollars,pesos from %s where %s.name = %s;", tableName, tableName, name))
+	defer rows.Close()
+
+	if e != nil {
+		log.Fatal("failure querying the database: ", e)
+	}
+
+	balances := map[string]int{}
+
+	for rows.Next() {
+		var dollars int
+		var pesos int
+		var name string
+		rows.Scan(&name, &dollars, &pesos)
+		balances[name] = dollars
+	}
+
+	return &HedgeFund{}
+}
+
 func transactionHandler(w http.ResponseWriter, r *http.Request) {
 	balances := getBalances()
 	totalDollars := countTotalDollars(balances)
 	fmt.Fprintf(w, fmt.Sprintf("dollars before transacting: $%d\n\n", totalDollars))
 
-	trades := []Trade{}
+	hf1 := getEntity("hf1", "hedge_funds")
+	hf2 := getEntity("hf2", "hedge_funds")
+
+	traderTransaction := Transaction{
+		amount:   20,
+		currency: Dollars,
+	}
+	tradeeTransaction := Transaction{
+		amount:   10,
+		currency: Pesos,
+	}
+	offer := Offer{
+		traderTransaction: traderTransaction,
+		tradeeTransaction: tradeeTransaction,
+	}
+	trade := Trade{
+		trader: hf1,
+		tradee: hf2,
+		offer:  offer,
+	}
+	trades := []Trade{trade}
 	transactor := Transactor{}
 
 	transactor.ExecuteAll(trades)
@@ -75,9 +146,6 @@ func transactionHandler(w http.ResponseWriter, r *http.Request) {
 	totalDollars = countTotalDollars(balances)
 	fmt.Fprintf(w, fmt.Sprintf("dollars after transacting: $%d", totalDollars))
 }
-
-var db *sql.DB
-var err error
 
 func readHTMLFile(title string) (*Page, error) {
 	filename := title + ".html"
@@ -110,6 +178,42 @@ func hedgeFundsHandler(w http.ResponseWriter, r *http.Request) {
 	for name, dollars := range balances {
 		fmt.Fprintf(w, fmt.Sprintf("hedge fund %s has $%d!\n\n", name, dollars))
 	}
+}
+
+func htmlFor(filename string) string {
+	page, err := readHTMLFile(filename)
+
+	if err != nil {
+		log.Fatal(fmt.Sprintf("there was an error reading the file %s.html\n", filename))
+	}
+
+	return string(page.Body)
+}
+
+func hf1Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, htmlFor("hf1"))
+}
+
+func hf2Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, htmlFor("hf2"))
+}
+
+func hf3Handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, htmlFor("hf3"))
+}
+
+func hedgeFundHandler(name string) func(w http.ResponseWriter, r *http.Request) {
+	if name == "hf1" {
+		return hf1Handler
+	} else if name == "hf2" {
+		return hf2Handler
+	} else if name == "hf3" {
+		return hf3Handler
+	} else {
+		log.Fatal(fmt.Sprintf("no hedge fund with name %s\n", name))
+	}
+
+	return nil
 }
 
 func getBalances() map[string]int {
@@ -158,6 +262,10 @@ func registerRouteHandlers() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/hedge_funds", hedgeFundsHandler)
 	http.HandleFunc("/transaction", transactionHandler)
+	// TODO duplication
+	http.HandleFunc("/hf1", hf1Handler)
+	http.HandleFunc("/hf2", hedgeFundHandler("hf2"))
+	http.HandleFunc("/hf3", hedgeFundHandler("hf3"))
 	http.HandleFunc("/menu/", menuHandler)
 }
 
@@ -175,24 +283,26 @@ drop table if exists hedge_funds;
 create table hedge_funds (
   id      serial,
   name    varchar(50),
-  dollars integer
+  dollars integer,
+  pesos   integer
 );
 
-insert into hedge_funds (name, dollars) values ('hf1', 1234),
-                                               ('hf2', 5678),
-                                               ('hf3', 9090)
+insert into hedge_funds (name, dollars, pesos) values ('hf1', 1234, 123),
+                                                      ('hf2', 5678, 567),
+                                                      ('hf3', 9090, 909)
 ;
 
 drop table if exists banks;
 create table banks (
   id      serial,
   name    varchar(50),
-  dollars integer
+  dollars integer,
+  pesos   integer
 );
 
-insert into banks (name, dollars) values ('b1', 11111),
-                                         ('b2', 22222),
-                                         ('b3', 33333)
+insert into banks (name, dollars, pesos) values ('b1', 11111, 1111),
+                                                ('b2', 22222, 2222),
+                                                ('b3', 33333, 3333)
 ;
 `)
 
