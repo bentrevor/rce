@@ -8,7 +8,6 @@ import (
 
 	"database/sql"
 
-	rcfe "github.com/bentrevor/rcfe/src"
 	_ "github.com/lib/pq"
 )
 
@@ -105,15 +104,7 @@ func getEntity(entityName string, tableName string) Entity {
 		log.Fatal("failure querying the database: ", e)
 	}
 
-	balances := getBalances()
-
-	for name, balance := range balances {
-		var dollars int
-		var pesos int
-		var name string
-		rows.Scan(&name, &dollars, &pesos)
-		balances[name] = dollars
-	}
+	// balances := getBalances()
 
 	return &HedgeFund{}
 }
@@ -228,6 +219,6 @@ insert into banks (name, dollars, pesos) values ('b1', 11111, 1111),
 func main() {
 	connectToDb()
 	seedDB()
-	rcfe.registerRouteHandlers()
+	// rcfe.RegisterRouteHandlers()
 	startServer()
 }
