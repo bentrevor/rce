@@ -1,9 +1,9 @@
-package rcfe_test
+package rce_test
 
 import (
 	"testing"
 
-	. "github.com/bentrevor/rcfe/src"
+	. "github.com/bentrevor/rce/src"
 )
 
 var hedgeFund = HedgeFund{

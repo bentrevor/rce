@@ -1,4 +1,4 @@
-package rcfe
+package rce
 
 import (
 	"database/sql"
@@ -11,13 +11,21 @@ type DB interface {
 	GetInstitution(string) Institution
 }
 
-func NewPostgresDB() *sql.DB {
+type PostgresDB struct {
+	SqlConnection *sql.DB
+}
+
+func NewPostgresDB() *PostgresDB {
 	// TODO don't disable ssl...
-	db, err := sql.Open("postgres", "user=rcfe_admin dbname=rcfe_dev sslmode=disable")
+	db, err := sql.Open("postgres", "user=rce_admin dbname=rce_dev sslmode=disable")
 
 	if err != nil {
 		log.Fatal("failure connecting to database: ", err)
 	}
 
-	return db
+	return &PostgresDB{SqlConnection: db}
+}
+
+func (PostgresDB) GetBalance(institution Institution) map[Currency]int {
+	return nil
 }

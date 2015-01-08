@@ -1,22 +1,24 @@
 
 ## About
 
-"You're late.  And this is the most important test of your life.  Does anyone
-know what 2 + 2 equals?"
+> "You're late.  And this is the most important test of your life.  Does anyone
+> know what 2 + 2 equals?"
+>
+> "5?"
+>
+> "Correct.  Anyone else?"
+>
+> "6.  6 minutes left."
+>
+> "Correct.  Simon?"
+>
+> "Uh, 4."
+>
+> "And exactly what formula did _you_ use?"
 
-"5?"
+ \- The Tale of the Renegade Virus
 
-"Correct.  Anyone else?"
-
-"6.  6 minutes left."
-
-"Correct.  Simon?"
-
-"Uh, 4."
-
-"And exactly what formula did _you_ use?"
-
-## Thoughts
+### Race Condition Exchange
 
 This is going to be a "currency exchange" simulation with a very faulty
 database.  I don't know how a real currency exchange works though, so it won't
@@ -33,8 +35,8 @@ currency - these rates might fluctuate from turn to turn.
 - Hopefully, the fun part will be to try construct trades that cause favorable
 data inconsistency.
 
-- I'm really unsure about the objective of the game.  I don't think it's
-zero-sum, since there's technically no resource that is limited.  So the
-players could try to team up to "generate" the most money in the system.  Or
-they could work together to beat the banks (whatever that means).  Or they
-could just try to maximize their own hedge fund's accounts.
+- I'm really unsure about the objective of the game.  It's not technically
+zero-sum, since there's no resource that is limited.  So the players could try
+to team up to "generate" the most money in the system.  Or they could work
+together to beat the banks (whatever that means).  Or they could just try to
+maximize their own hedge fund's accounts.

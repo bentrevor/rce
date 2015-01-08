@@ -1,44 +1,28 @@
-package rcfe_test
+package rce_test
 
 import (
+	"database/sql"
+	"log"
 	"testing"
 
-	. "github.com/bentrevor/rcfe/src"
+	. "github.com/bentrevor/rce/src"
+
+	_ "github.com/lib/pq"
 )
 
-type MemoryDB struct {
-	institutions []Institution
-}
+func NewTestDB() *PostgresDB {
+	// TODO don't disable ssl...
+	db, err := sql.Open("postgres", "user=rce_admin dbname=rce_test sslmode=disable")
 
-func (MemoryDB) GetBalance(institution Institution) map[Currency]int {
-	return map[Currency]int{
-		Dollars: 0,
-	}
-}
-
-func (db MemoryDB) Seed(s string) {
-	hedgeFund := HedgeFund{Name: "hedge fund name", Dollars: 100}
-	bank := Bank{Name: "bank name", Dollars: 200}
-
-	db.institutions = []Institution{hedgeFund, bank}
-}
-
-func (db MemoryDB) GetInstitution(name string) Institution {
-	for _, institution := range db.institutions {
-		if institution.GetName() == name {
-			return institution
-		}
+	if err != nil {
+		log.Fatal("failure connecting to database: ", err)
 	}
 
-	return nil
-}
-
-func NewMemoryDB() *MemoryDB {
-	return &MemoryDB{}
+	return &PostgresDB{SqlConnection: db}
 }
 
 func TestDB_CanGetBalance(t *testing.T) {
-	memoryDB := NewMemoryDB()
+	memoryDB := NewTestDB()
 
 	balance := memoryDB.GetBalance(HedgeFund{})
 	dollars := balance[Dollars]

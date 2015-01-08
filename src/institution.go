@@ -1,4 +1,4 @@
-package rcfe
+package rce
 
 type Currency string
 

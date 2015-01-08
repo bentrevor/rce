@@ -1,4 +1,4 @@
-package rcfe_test
+package rce_test
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package rcfe
+package rce
 
 // func registerRouteHandlers() {
 // 	fmt.Println("registering handlers...")

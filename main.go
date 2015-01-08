@@ -167,7 +167,7 @@ func countTotalDollars(balances map[string]int) int {
 func connectToDb() {
 	fmt.Println("connecting to db...")
 	// TODO don't disable ssl...
-	db, err = sql.Open("postgres", "user=rcfe_admin dbname=rcfe_dev sslmode=disable")
+	db, err = sql.Open("postgres", "user=rce_admin dbname=rce_dev sslmode=disable")
 
 	if err != nil {
 		log.Fatal("failure connecting to database: ", err)
@@ -219,6 +219,6 @@ insert into banks (name, dollars, pesos) values ('b1', 11111, 1111),
 func main() {
 	connectToDb()
 	seedDB()
-	// rcfe.RegisterRouteHandlers()
+	// rce.RegisterRouteHandlers()
 	startServer()
 }
