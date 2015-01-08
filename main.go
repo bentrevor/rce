@@ -221,6 +221,7 @@ func hedgeFundHandler(name string) func(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
+// TODO make a data structure for this
 func getBalances() map[string]map[Currency]int {
 	rows, e := db.Query("select name,dollars,pesos from hedge_funds;")
 	defer rows.Close()
