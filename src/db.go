@@ -2,17 +2,18 @@ package rce
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 )
 
-type DB interface {
-	Seed(string)
+type DbConnection interface {
+	Seed([]Institution)
 	GetBalance(Institution) map[Currency]int
 	GetInstitution(string) Institution
 }
 
 type PostgresDB struct {
-	SqlConnection *sql.DB
+	*sql.DB
 }
 
 func NewPostgresDB() *PostgresDB {
@@ -23,9 +24,29 @@ func NewPostgresDB() *PostgresDB {
 		log.Fatal("failure connecting to database: ", err)
 	}
 
-	return &PostgresDB{SqlConnection: db}
+	return &PostgresDB{DB: db}
 }
 
 func (PostgresDB) GetBalance(institution Institution) map[Currency]int {
 	return nil
+}
+
+func CreateInstitutionStatement(institution Institution) string {
+	tableName := institution.TableName()
+	insertClause := fmt.Sprintf("insert into %s ", tableName)
+
+	columnNames := getColumnNames(institution)
+	columnValues := getColumnValues(institution)
+
+	valuesClause := fmt.Sprintf("(%s) values ('%s');", columnNames, columnValues)
+
+	return insertClause + valuesClause
+}
+
+func getColumnNames(institution Institution) string {
+	return "name"
+}
+
+func getColumnValues(institution Institution) string {
+	return institution.GetName()
 }
