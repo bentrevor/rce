@@ -32,11 +32,11 @@ func NewTestDB() *PostgresDB {
 // }
 
 func TestDB_CanBuildQuery(t *testing.T) {
-	institution := HedgeFund{Name: "hedge fund name"}
+	institution := HedgeFund{Name: "hedge fund name", Dollars: 100}
 	statement := CreateInstitutionStatement(institution)
 
 	assert(t, strings.Index(statement, "insert into hedge_funds") != -1, fmt.Sprintf("should have found insert clause in '%s'", statement))
-	assert(t, strings.Index(statement, "(name) values ('hedge fund name')") != -1, fmt.Sprintf("should have found values clause in '%s'", statement))
+	assert(t, strings.Index(statement, "(name,dollars) values ('hedge fund name',100)") != -1, fmt.Sprintf("should have found values clause in '%s'", statement))
 }
 
 // func TestDB_CanSeedFromInstitutions(t *testing.T) {

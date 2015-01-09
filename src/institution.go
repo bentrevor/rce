@@ -8,6 +8,7 @@ const (
 
 type Institution interface {
 	GetName() string
+	GetDollars() int
 	TableName() string
 }
 
@@ -33,6 +34,10 @@ func (Bank) TableName() string {
 // know a better way to write methods with interface args
 func (h HedgeFund) GetName() string {
 	return h.Name
+}
+
+func (h HedgeFund) GetDollars() int {
+	return h.Dollars
 }
 
 func (b Bank) GetName() string {
