@@ -16,14 +16,10 @@ var bank = Bank{
 	Dollars: 100,
 }
 
-func TestHedgeFund_HasATableInTheDB(t *testing.T) {
-	assertEquals(t, "hedge fund name", hedgeFund.Name)
-	assertEquals(t, 50, hedgeFund.Dollars)
-	assertEquals(t, "hedge_funds", hedgeFund.TableName())
-}
-
-func TestBank_HasATableInTheDB(t *testing.T) {
-	assertEquals(t, "bank name", bank.Name)
-	assertEquals(t, 100, bank.Dollars)
+func TestInstitution_HasFunctionsForDBInfo(t *testing.T) {
 	assertEquals(t, "banks", bank.TableName())
+	assertEquals(t, "hedge_funds", hedgeFund.TableName())
+
+	assertEquals(t, InstitutionColumns, bank.ColumnNames())
+	assertEquals(t, InstitutionColumns, hedgeFund.ColumnNames())
 }
