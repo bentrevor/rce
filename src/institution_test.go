@@ -6,20 +6,12 @@ import (
 	. "github.com/bentrevor/rce/src"
 )
 
-var hedgeFund = HedgeFund{
-	Name:    "hedge fund name",
-	Dollars: 50,
-}
-
-var bank = Bank{
-	Name:    "bank name",
-	Dollars: 100,
-}
+var hedgeFund = NewHedgeFund("hedge fund name")
+var bank = NewBank("bank name")
 
 func TestInstitution_HasFunctionsForDBInfo(t *testing.T) {
-	assertEquals(t, "banks", bank.TableName())
-	assertEquals(t, "hedge_funds", hedgeFund.TableName())
+	assertEquals(t, "banks", bank.TableName)
+	assertEquals(t, "hedge_funds", hedgeFund.TableName)
 
-	assertEquals(t, InstitutionColumns, bank.ColumnNames())
-	assertEquals(t, InstitutionColumns, hedgeFund.ColumnNames())
+	assertEquals(t, hedgeFund.ColumnNames, bank.ColumnNames)
 }

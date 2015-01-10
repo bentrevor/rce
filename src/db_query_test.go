@@ -11,7 +11,7 @@ import (
 )
 
 func TestDB_CanBuildQuery(t *testing.T) {
-	institution := HedgeFund{Name: "hedge fund name", Dollars: 100}
+	institution := NewHedgeFund("hedge fund name")
 	statement := CreateInstitutionStatement(institution)
 
 	assert(t, strings.Index(statement, "insert into hedge_funds") != -1, fmt.Sprintf("should have found insert clause in '%s'", statement))
