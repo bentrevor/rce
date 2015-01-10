@@ -96,3 +96,24 @@ package rce
 // func hf3Handler(w http.ResponseWriter, r *http.Request) {
 // 	fmt.Fprintf(w, htmlFor("hf3"))
 // }
+
+// func readHTMLFile(title string) (*Page, error) {
+// 	filename := title + ".html"
+// 	body, err := ioutil.ReadFile(filename)
+
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return &Page{Title: title, Body: body}, nil
+// }
+
+// func htmlFor(filename string) string {
+// 	page, err := readHTMLFile(filename)
+
+// 	if err != nil {
+// 		log.Fatal(fmt.Sprintf("there was an error reading the file %s.html\n", filename))
+// 	}
+
+// 	return string(page.Body)
+// }
