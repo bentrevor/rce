@@ -6,27 +6,31 @@ const (
 	Dollars Currency = "dollars"
 )
 
-type Institution struct {
+const (
+	PlayerColumnNames string = "name,dollars"
+)
+
+type Player struct {
 	Name        string
 	Dollars     int
 	TableName   string
 	ColumnNames string
 }
 
-func NewBank(name string) Institution {
-	return Institution{
+func NewBank(name string) Player {
+	return Player{
 		Name:        name,
 		Dollars:     200,
 		TableName:   "banks",
-		ColumnNames: "name,dollars",
+		ColumnNames: PlayerColumnNames,
 	}
 }
 
-func NewHedgeFund(name string) Institution {
-	return Institution{
+func NewHedgeFund(name string) Player {
+	return Player{
 		Name:        name,
 		Dollars:     100,
 		TableName:   "hedge_funds",
-		ColumnNames: "name,dollars",
+		ColumnNames: PlayerColumnNames,
 	}
 }

@@ -28,7 +28,7 @@ func NewTestDB() *PostgresDB {
 // 	assertEquals(t, 10, dollars)
 // }
 
-// func TestDB_CanSeedFromInstitutions(t *testing.T) {
+// func TestDB_CanSeedFromPlayers(t *testing.T) {
 // 	memoryDB := NewTestDB()
 // 	memoryDB.Seed(nil)
 // 	balance := memoryDB.GetBalance(HedgeFund{})

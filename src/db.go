@@ -6,9 +6,9 @@ import (
 )
 
 type DbConnection interface {
-	Seed([]Institution)
-	GetBalance(Institution) map[Currency]int
-	GetInstitution(string) Institution
+	Seed([]Player)
+	GetBalance(Player) map[Currency]int
+	GetPlayer(string) Player
 }
 
 type PostgresDB struct {
@@ -26,6 +26,6 @@ func NewPostgresDB() *PostgresDB {
 	return &PostgresDB{DB: db}
 }
 
-func (PostgresDB) GetBalance(institution Institution) map[Currency]int {
+func (PostgresDB) GetBalance(player Player) map[Currency]int {
 	return nil
 }

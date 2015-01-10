@@ -9,7 +9,7 @@ import (
 var hedgeFund = NewHedgeFund("hedge fund name")
 var bank = NewBank("bank name")
 
-func TestInstitution_HasFunctionsForDBInfo(t *testing.T) {
+func TestPlayer_HasFunctionsForDBInfo(t *testing.T) {
 	assertEquals(t, "banks", bank.TableName)
 	assertEquals(t, "hedge_funds", hedgeFund.TableName)
 
