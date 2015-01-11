@@ -1,6 +1,9 @@
 package rce
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type Transaction struct {
 	Amount   int
@@ -21,7 +24,29 @@ type Trade struct {
 
 type Transactor struct{}
 
-func (transactor Transactor) Execute(trade Trade) error {
-	fmt.Println("executing: %s", trade.Desc)
+func (transactor Transactor) Execute(trade Trade, db *PostgresDB) error {
+	traderUpdates := UpdateStatements(trade)
+	receiverUpdates := UpdateStatements(trade)
+
+	for _, update := range append(traderUpdates, receiverUpdates...) {
+		fmt.Println("executing update: ", update)
+		db.Exec(update)
+		rows, err := db.Query("select name,dollars from hedge_funds;")
+		defer rows.Close()
+
+		if err != nil {
+			log.Fatal("got an error: ", err)
+		}
+		for rows.Next() {
+			var name string
+			var dollars int
+			rows.Scan(&name, &dollars)
+
+			fmt.Println("name: ", name, "dollars: ", dollars)
+		}
+	}
+	// db.Exec(traderUpdate)
+	// db.Exec(receiverUpdate)
+
 	return nil
 }
