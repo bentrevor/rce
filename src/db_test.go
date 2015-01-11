@@ -9,6 +9,28 @@ import (
 	_ "github.com/lib/pq"
 )
 
+var seedStr = `
+drop table if exists hedge_funds;
+create table hedge_funds (
+  id      serial,
+  name    varchar(50),
+  dollars integer,
+  pesos   integer
+);
+
+insert into hedge_funds (name, dollars) values ('test hedge fund', 100);
+
+drop table if exists banks;
+create table banks (
+  id      serial,
+  name    varchar(50),
+  dollars integer,
+  pesos   integer
+);
+
+insert into banks (name, dollars) values ('test bank', 200);
+`
+
 func NewTestDB() *PostgresDB {
 	// TODO don't disable ssl...
 	db, err := sql.Open("postgres", "user=rce_admin dbname=rce_test sslmode=disable")
@@ -17,7 +39,9 @@ func NewTestDB() *PostgresDB {
 		log.Fatal("failure connecting to database: ", err)
 	}
 
-	return &PostgresDB{DB: db}
+	postgresDB := &PostgresDB{DB: db}
+	postgresDB.Seed(seedStr)
+	return postgresDB
 }
 
 // func TestDB_CanGetBalance(t *testing.T) {
