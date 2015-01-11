@@ -19,6 +19,7 @@ func TestDB_CanBuildQuery(t *testing.T) {
 }
 
 func TestDB_CanBuildUpdateQuery(t *testing.T) {
+	NewTestDB()
 	trade := NewTestTrade()
 	statements := UpdateStatements(trade)
 	traderCurrency := trade.Offer.TraderTransaction.Currency

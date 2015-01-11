@@ -29,7 +29,7 @@ func (db PostgresDB) GetBalance(player Player) map[Currency]int {
 	defer rows.Close()
 
 	if err != nil {
-		log.Fatal("got an error: ", err)
+		log.Fatal("\n\n\ngot an error getting balances with query:\n  ", query, "\nerr:\n  ", err, "\n\n\n")
 	}
 
 	for rows.Next() {
@@ -39,7 +39,6 @@ func (db PostgresDB) GetBalance(player Player) map[Currency]int {
 		balance[Dollars] = dollars
 	}
 
-	fmt.Println(player.Name)
 	return balance
 }
 
@@ -47,6 +46,6 @@ func (db PostgresDB) Seed(seed string) {
 	_, err := db.Exec(seed)
 
 	if err != nil {
-		log.Fatal("error seeding the database: ", err)
+		log.Fatal("\n\nerror seeding the database with seed:\n  ", seed, "\nerr:\n  ", err, "\n\n")
 	}
 }

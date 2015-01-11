@@ -9,16 +9,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var (
-	db                  *PostgresDB
-	trader              Player
-	receiver            Player
-	traderTransaction   Transaction
-	receiverTransaction Transaction
-	offer               Offer
-	trade               Trade
-)
-
 func NewTestTrade() Trade {
 	trader = NewHedgeFund("test hedge fund")
 	receiver = NewBank("test bank")
