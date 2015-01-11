@@ -1,7 +1,6 @@
 package rce_test
 
 import (
-	"fmt"
 	"testing"
 
 	. "github.com/bentrevor/rce/src"
@@ -32,24 +31,25 @@ func TestDB_CanBuildInsertStatementFromPlayer(t *testing.T) {
 	assert(t, StringIncludes(statement, "(name,dollars) values ('hedge fund name',100)"), "should have found values clause")
 }
 
-func TestDB_CanBuildUpdateStatementFromTrade(t *testing.T) {
-	trade := NewTestTrade()
-	statements := Update{}.Statements(trade)
-	traderCurrency := trade.Offer.TraderTransaction.Currency
-	traderValuesClause := fmt.Sprintf("%s = %s + %d", traderCurrency, traderCurrency, trade.Offer.TraderTransaction.Amount)
-	receiverCurrency := trade.Offer.ReceiverTransaction.Currency
-	receiverValuesClause := fmt.Sprintf("%s = %s + %d", receiverCurrency, receiverCurrency, trade.Offer.ReceiverTransaction.Amount)
+// func TestDB_CanBuildUpdateStatementsFromTrade(t *testing.T) {
+// 	transaction := Transaction{Trader: hedgeFund, Receiver: bank, Amount: 100, Currency: Dollars}
 
-	assertEquals(t, 2, len(statements))
+// 	statements := Update{}.Statements(transaction)
+// 	traderCurrency := trade.Offer.TraderTransaction.Currency
+// 	traderValuesClause := fmt.Sprintf("%s = %s + %d", traderCurrency, traderCurrency, trade.Offer.TraderTransaction.Amount)
+// 	receiverCurrency := trade.Offer.ReceiverTransaction.Currency
+// 	receiverValuesClause := fmt.Sprintf("%s = %s + %d", receiverCurrency, receiverCurrency, trade.Offer.ReceiverTransaction.Amount)
 
-	traderUpdate := statements[0]
-	receiverUpdate := statements[1]
+// 	assertEquals(t, 2, len(statements))
 
-	assert(t, StringIncludes(traderUpdate, "update hedge_funds set "), "should have found update clause in '%s'")
-	assert(t, StringIncludes(traderUpdate, traderValuesClause), "should have found values clause in '%s'")
-	assert(t, StringIncludes(traderUpdate, "where name = "), "should have found values clause in '%s'")
+// 	traderUpdate := statements[0]
+// 	receiverUpdate := statements[1]
 
-	assert(t, StringIncludes(receiverUpdate, "update banks set "), "should have found update clause in '%s'")
-	assert(t, StringIncludes(receiverUpdate, receiverValuesClause), "should have found values clause in '%s'")
-	assert(t, StringIncludes(receiverUpdate, "where name = "), "should have found values clause in '%s'")
-}
+// 	assert(t, StringIncludes(traderUpdate, "update hedge_funds set "), "should have found update clause in '%s'")
+// 	assert(t, StringIncludes(traderUpdate, traderValuesClause), "should have found values clause in '%s'")
+// 	assert(t, StringIncludes(traderUpdate, "where name = "), "should have found values clause in '%s'")
+
+// 	assert(t, StringIncludes(receiverUpdate, "update banks set "), "should have found update clause in '%s'")
+// 	assert(t, StringIncludes(receiverUpdate, receiverValuesClause), "should have found values clause in '%s'")
+// 	assert(t, StringIncludes(receiverUpdate, "where name = "), "should have found values clause in '%s'")
+// }

@@ -1,27 +1,22 @@
 package rce
 
 type Transaction struct {
+	Trader   Player
+	Receiver Player
 	Amount   int
 	Currency Currency
 }
 
-type Offer struct {
-	TraderTransaction   Transaction
-	ReceiverTransaction Transaction
-}
-
 type Trade struct {
-	Trader   Player
-	Receiver Player
-	Offer    Offer
-	Desc     string
+	Transactions []Transaction
+	Desc         string
 }
 
 type Transactor struct{}
 
-func (transactor Transactor) Execute(trade Trade, db *PostgresDB) error {
-	traderUpdates := Update{}.Statements(trade)
-	receiverUpdates := Update{}.Statements(trade)
+func (transactor Transactor) Execute(transaction Transaction, db *PostgresDB) error {
+	traderUpdates := Update{}.Statements(transaction)
+	receiverUpdates := Update{}.Statements(transaction)
 
 	for _, update := range append(traderUpdates, receiverUpdates...) {
 		db.Exec(update)

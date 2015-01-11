@@ -13,7 +13,6 @@ var (
 	receiver            Player
 	traderTransaction   Transaction
 	receiverTransaction Transaction
-	offer               Offer
 	trade               Trade
 	err                 error
 )

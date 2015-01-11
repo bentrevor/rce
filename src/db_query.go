@@ -36,9 +36,9 @@ func (Seed) Statement(players []Player) string {
 	return statement
 }
 
-func (Update) Statements(trade Trade) []string {
-	traderUpdate := updateBalanceStatement(trade.Offer.TraderTransaction, trade.Trader)
-	receiverUpdate := updateBalanceStatement(trade.Offer.ReceiverTransaction, trade.Receiver)
+func (Update) Statements(transaction Transaction) []string {
+	traderUpdate := updateBalanceStatements(transaction)
+	receiverUpdate := updateBalanceStatements(transaction)
 
 	return []string{traderUpdate, receiverUpdate}
 }
@@ -58,7 +58,8 @@ func resetPlayersStatement() string {
 	return statement
 }
 
-func updateBalanceStatement(transaction Transaction, player Player) string {
+func updateBalanceStatements(transaction Transaction) string {
+	player := transaction.Trader
 	updateClause := fmt.Sprintf("update %s set ", player.TableName)
 	currency := transaction.Currency
 	valuesClause := fmt.Sprintf("%s = %s + %d ", currency, currency, transaction.Amount)
