@@ -1,6 +1,7 @@
 package rce_test
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/bentrevor/rce/src"
@@ -19,11 +20,13 @@ var (
 )
 
 func NewTestTrade() Trade {
-	trader := NewHedgeFund("test hedge fund")
-	receiver := NewBank("test bank")
-	traderTransaction := Transaction{Amount: 10, Currency: Dollars}
-	receiverTransaction := Transaction{Amount: 5, Currency: Dollars}
-	offer := Offer{TraderTransaction: traderTransaction, ReceiverTransaction: receiverTransaction}
+	trader = NewHedgeFund("test hedge fund")
+	receiver = NewBank("test bank")
+
+	traderTransaction = Transaction{Amount: 10, Currency: Dollars}
+	receiverTransaction = Transaction{Amount: 5, Currency: Dollars}
+
+	offer = Offer{TraderTransaction: traderTransaction, ReceiverTransaction: receiverTransaction}
 	return Trade{
 		Trader:   trader,
 		Receiver: receiver,
@@ -43,6 +46,8 @@ func TestTransactor_CanExecuteATrade(t *testing.T) {
 	db := NewTestDB()
 	transactor.Execute(trade, db)
 
-	assertEquals(t, 95, trader.Dollars)
-	assertEquals(t, 205, receiver.Dollars)
+	fmt.Println(trade.Offer.TraderTransaction)
+	fmt.Println(trade.Offer.ReceiverTransaction)
+	assertEquals(t, 95, db.GetBalance(trader)[Dollars])
+	assertEquals(t, 205, db.GetBalance(receiver)[Dollars])
 }

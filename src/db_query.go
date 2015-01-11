@@ -6,10 +6,9 @@ func CreatePlayerStatement(player Player) string {
 	tableName := player.TableName
 	insertClause := fmt.Sprintf("insert into %s ", tableName)
 
-	columnNames := getPlayerColumnNames()
 	columnValues := getPlayerColumnValues(player)
 
-	valuesClause := fmt.Sprintf("(%s) values (%s);", columnNames, columnValues)
+	valuesClause := fmt.Sprintf("(%s) values (%s);", player.ColumnNames, columnValues)
 
 	return insertClause + valuesClause
 }
@@ -28,11 +27,6 @@ func updateBalanceStatement(transaction Transaction, player Player) string {
 	whereClause := fmt.Sprintf("where name = '%s';", player.Name)
 
 	return updateClause + valuesClause + whereClause
-}
-
-// TODO this is bad, if I change these columns I have to update it here too
-func getPlayerColumnNames() string {
-	return "name,dollars"
 }
 
 func getPlayerColumnValues(player Player) string {

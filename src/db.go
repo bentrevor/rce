@@ -2,6 +2,7 @@ package rce
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -20,8 +21,26 @@ func NewPostgresDB() *PostgresDB {
 	return &PostgresDB{DB: db}
 }
 
-func (PostgresDB) GetBalance(player Player) map[Currency]int {
-	return nil
+func (db PostgresDB) GetBalance(player Player) map[Currency]int {
+	balance := make(map[Currency]int)
+
+	query := fmt.Sprintf("select %s from %s;", player.ColumnNames, player.TableName)
+	rows, err := db.Query(query)
+	defer rows.Close()
+
+	if err != nil {
+		log.Fatal("got an error: ", err)
+	}
+
+	for rows.Next() {
+		var name string
+		var dollars int
+		rows.Scan(&name, &dollars)
+		balance[Dollars] = dollars
+	}
+
+	fmt.Println(player.Name)
+	return balance
 }
 
 func (db PostgresDB) Seed(seed string) {
