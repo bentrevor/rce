@@ -8,6 +8,25 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func TestDB_CanSeedFromSql(t *testing.T) {
+	seed := `
+	DROP TABLE IF EXISTS hedge_funds;
+	CREATE TABLE hedge_funds (
+		id      SERIAL,
+		name    VARCHAR(50) UNIQUE,
+		dollars INTEGER
+	);
+
+	INSERT INTO hedge_funds (name, dollars) VALUES ('test hedge fund', 1234);
+`
+
+	memoryDB := NewTestDB()
+	memoryDB.Seed(seed)
+	hedgeFund := NewHedgeFund("test hedge fund")
+
+	assertEquals(t, 1234, memoryDB.GetBalance(hedgeFund)[Dollars])
+}
+
 func TestDB_CanGetBalance(t *testing.T) {
 	memoryDB := NewTestDB()
 	memoryDB.Seed(testSeed)
@@ -16,15 +35,4 @@ func TestDB_CanGetBalance(t *testing.T) {
 	dollars := balance[Dollars]
 
 	assertEquals(t, 100, dollars)
-}
-
-func TestDB_CanSeedFromSql(t *testing.T) {
-	memoryDB := NewTestDB()
-	memoryDB.Seed(testSeed)
-	hedgeFund := NewHedgeFund("test hedge fund")
-
-	balance := memoryDB.GetBalance(hedgeFund)
-	dollars := balance[Dollars]
-
-	assertEquals(t, 0, dollars)
 }

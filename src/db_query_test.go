@@ -2,7 +2,6 @@ package rce_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	. "github.com/bentrevor/rce/src"
@@ -10,15 +9,25 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func TestDB_CanBuildQuery(t *testing.T) {
+func TestDB_CanBuildSeedStatement(t *testing.T) {
+	player := NewHedgeFund("hedge fund name")
+	players := []Player{player}
+	statement := SeedStatement(players)
+
+	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS hedge_funds;"), "should have found drop table clause in statement")
+	assert(t, StringIncludes(statement, "CREATE TABLE hedge_funds"), "should have found create table clause in statement")
+	assert(t, StringIncludes(statement, CreatePlayerStatement(player)), "should have found create player clause in statement")
+}
+
+func TestDB_CanBuildInsertStatement(t *testing.T) {
 	player := NewHedgeFund("hedge fund name")
 	statement := CreatePlayerStatement(player)
 
-	assert(t, strings.Index(statement, "insert into hedge_funds") != -1, fmt.Sprintf("should have found insert clause in '%s'", statement))
-	assert(t, strings.Index(statement, "(name,dollars) values ('hedge fund name',100)") != -1, fmt.Sprintf("should have found values clause in '%s'", statement))
+	assert(t, StringIncludes(statement, "insert into hedge_funds"), "should have found insert clause")
+	assert(t, StringIncludes(statement, "(name,dollars) values ('hedge fund name',100)"), "should have found values clause")
 }
 
-func TestDB_CanBuildUpdateQuery(t *testing.T) {
+func TestDB_CanBuildUpdateStatement(t *testing.T) {
 	NewTestDB()
 	trade := NewTestTrade()
 	statements := UpdateStatements(trade)
@@ -32,11 +41,11 @@ func TestDB_CanBuildUpdateQuery(t *testing.T) {
 	traderUpdate := statements[0]
 	receiverUpdate := statements[1]
 
-	assert(t, strings.Index(traderUpdate, "update hedge_funds set ") != -1, fmt.Sprintf("should have found update clause in '%s'", traderUpdate))
-	assert(t, strings.Index(traderUpdate, traderValuesClause) != -1, fmt.Sprintf("should have found values clause in '%s'", traderUpdate))
-	assert(t, strings.Index(traderUpdate, "where name = ") != -1, fmt.Sprintf("should have found values clause in '%s'", traderUpdate))
+	assert(t, StringIncludes(traderUpdate, "update hedge_funds set "), "should have found update clause in '%s'")
+	assert(t, StringIncludes(traderUpdate, traderValuesClause), "should have found values clause in '%s'")
+	assert(t, StringIncludes(traderUpdate, "where name = "), "should have found values clause in '%s'")
 
-	assert(t, strings.Index(receiverUpdate, "update banks set ") != -1, fmt.Sprintf("should have found update clause in '%s'", receiverUpdate))
-	assert(t, strings.Index(receiverUpdate, receiverValuesClause) != -1, fmt.Sprintf("should have found values clause in '%s'", receiverUpdate))
-	assert(t, strings.Index(receiverUpdate, "where name = ") != -1, fmt.Sprintf("should have found values clause in '%s'", receiverUpdate))
+	assert(t, StringIncludes(receiverUpdate, "update banks set "), "should have found update clause in '%s'")
+	assert(t, StringIncludes(receiverUpdate, receiverValuesClause), "should have found values clause in '%s'")
+	assert(t, StringIncludes(receiverUpdate, "where name = "), "should have found values clause in '%s'")
 }
