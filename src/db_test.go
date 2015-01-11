@@ -20,7 +20,7 @@ func TestDB_CanSeedFromSql(t *testing.T) {
 	INSERT INTO hedge_funds (name, dollars) VALUES ('test hedge fund', 1234);
 `
 
-	memoryDB := NewTestDB()
+	memoryDB := NewEmptyTestDB()
 	memoryDB.Seed(seed)
 	hedgeFund := NewHedgeFund("test hedge fund")
 
@@ -28,9 +28,10 @@ func TestDB_CanSeedFromSql(t *testing.T) {
 }
 
 func TestDB_CanGetBalance(t *testing.T) {
-	memoryDB := NewTestDB()
-	memoryDB.Seed(testSeed)
+	memoryDB := NewEmptyTestDB()
 	hedgeFund := NewHedgeFund("test hedge fund")
+	seedStatement := Seed{}.Statement([]Player{hedgeFund})
+	memoryDB.Seed(seedStatement)
 	balance := memoryDB.GetBalance(hedgeFund)
 	dollars := balance[Dollars]
 

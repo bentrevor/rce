@@ -20,8 +20,8 @@ type Trade struct {
 type Transactor struct{}
 
 func (transactor Transactor) Execute(trade Trade, db *PostgresDB) error {
-	traderUpdates := UpdateStatements(trade)
-	receiverUpdates := UpdateStatements(trade)
+	traderUpdates := Update{}.Statements(trade)
+	receiverUpdates := Update{}.Statements(trade)
 
 	for _, update := range append(traderUpdates, receiverUpdates...) {
 		db.Exec(update)

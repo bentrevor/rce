@@ -9,28 +9,32 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func TestDB_CanBuildSeedStatement(t *testing.T) {
-	player := NewHedgeFund("hedge fund name")
-	players := []Player{player}
-	statement := SeedStatement(players)
+func TestDB_CanBuildSeedStatementFromListOfPlayers(t *testing.T) {
+	hedgeFund := NewHedgeFund("hedge fund name")
+	bank := NewHedgeFund("hedge fund name")
+	players := []Player{hedgeFund, bank}
+	statement := Seed{}.Statement(players)
 
 	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS hedge_funds;"), "should have found drop table clause in statement")
 	assert(t, StringIncludes(statement, "CREATE TABLE hedge_funds"), "should have found create table clause in statement")
-	assert(t, StringIncludes(statement, CreatePlayerStatement(player)), "should have found create player clause in statement")
+	assert(t, StringIncludes(statement, Insert{}.Statement(hedgeFund)), "should have found create hedgeFund clause in statement")
+
+	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS banks;"), "should have found drop table clause in statement")
+	assert(t, StringIncludes(statement, "CREATE TABLE banks"), "should have found create table clause in statement")
+	assert(t, StringIncludes(statement, Insert{}.Statement(bank)), "should have found create bank clause in statement")
 }
 
-func TestDB_CanBuildInsertStatement(t *testing.T) {
+func TestDB_CanBuildInsertStatementFromPlayer(t *testing.T) {
 	player := NewHedgeFund("hedge fund name")
-	statement := CreatePlayerStatement(player)
+	statement := Insert{}.Statement(player)
 
 	assert(t, StringIncludes(statement, "insert into hedge_funds"), "should have found insert clause")
 	assert(t, StringIncludes(statement, "(name,dollars) values ('hedge fund name',100)"), "should have found values clause")
 }
 
-func TestDB_CanBuildUpdateStatement(t *testing.T) {
-	NewTestDB()
+func TestDB_CanBuildUpdateStatementFromTrade(t *testing.T) {
 	trade := NewTestTrade()
-	statements := UpdateStatements(trade)
+	statements := Update{}.Statements(trade)
 	traderCurrency := trade.Offer.TraderTransaction.Currency
 	traderValuesClause := fmt.Sprintf("%s = %s + %d", traderCurrency, traderCurrency, trade.Offer.TraderTransaction.Amount)
 	receiverCurrency := trade.Offer.ReceiverTransaction.Currency
