@@ -8,6 +8,20 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func TestDB_CanGetBalance(t *testing.T) {
+	// TODO need a way to use one describe for an entire file
+	describe("database")
+	memoryDB := NewEmptyTestDB()
+	hedgeFund := NewHedgeFund("test hedge fund")
+	seedStatement := Seed{}.Statement([]Player{hedgeFund})
+	memoryDB.Seed(seedStatement)
+	balance := memoryDB.GetBalance(hedgeFund)
+	dollars := balance[Dollars]
+
+	it("can query the database")
+	assertEquals(t, 100, dollars)
+}
+
 func TestDB_CanSeedFromSql(t *testing.T) {
 	seed := `
 	DROP TABLE IF EXISTS hedge_funds;
@@ -24,16 +38,6 @@ func TestDB_CanSeedFromSql(t *testing.T) {
 	memoryDB.Seed(seed)
 	hedgeFund := NewHedgeFund("test hedge fund")
 
+	it("executes sql")
 	assertEquals(t, 1234, memoryDB.GetBalance(hedgeFund)[Dollars])
-}
-
-func TestDB_CanGetBalance(t *testing.T) {
-	memoryDB := NewEmptyTestDB()
-	hedgeFund := NewHedgeFund("test hedge fund")
-	seedStatement := Seed{}.Statement([]Player{hedgeFund})
-	memoryDB.Seed(seedStatement)
-	balance := memoryDB.GetBalance(hedgeFund)
-	dollars := balance[Dollars]
-
-	assertEquals(t, 100, dollars)
 }

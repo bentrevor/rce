@@ -7,16 +7,6 @@ import (
 	. "github.com/bentrevor/rce/src"
 )
 
-var (
-	testDB              *PostgresDB
-	trader              Player
-	receiver            Player
-	traderTransaction   Transaction
-	receiverTransaction Transaction
-	trade               Trade
-	err                 error
-)
-
 func NewEmptyTestDB() *PostgresDB {
 	// TODO not sure if ssl should be enabled in tests
 	dbConfigs := "user=rce_admin dbname=rce_test sslmode=disable"

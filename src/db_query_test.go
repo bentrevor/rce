@@ -8,27 +8,36 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func TestDB_CanBuildInsertStatementFromPlayer(t *testing.T) {
+
+	player := NewHedgeFund("hedge fund name")
+
+	statement := Insert{}.Statement(player)
+
+	describe("insert statements")
+	it("knows which table to insert into")
+	assert(t, StringIncludes(statement, "insert into hedge_funds"))
+	it("knows which values to insert")
+	assert(t, StringIncludes(statement, "(name,dollars) values ('hedge fund name',100)"))
+}
+
 func TestDB_CanBuildSeedStatementFromListOfPlayers(t *testing.T) {
 	hedgeFund := NewHedgeFund("hedge fund name")
 	bank := NewHedgeFund("hedge fund name")
 	players := []Player{hedgeFund, bank}
+
 	statement := Seed{}.Statement(players)
 
-	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS hedge_funds;"), "should have found drop table clause in statement")
-	assert(t, StringIncludes(statement, "CREATE TABLE hedge_funds"), "should have found create table clause in statement")
-	assert(t, StringIncludes(statement, Insert{}.Statement(hedgeFund)), "should have found create hedgeFund clause in statement")
+	describe("seeding statements")
+	it("drops and recreates the hedge_fund and bank tables")
+	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS hedge_funds;"))
+	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS banks;"))
+	assert(t, StringIncludes(statement, "CREATE TABLE hedge_funds"))
+	assert(t, StringIncludes(statement, "CREATE TABLE banks"))
 
-	assert(t, StringIncludes(statement, "DROP TABLE IF EXISTS banks;"), "should have found drop table clause in statement")
-	assert(t, StringIncludes(statement, "CREATE TABLE banks"), "should have found create table clause in statement")
-	assert(t, StringIncludes(statement, Insert{}.Statement(bank)), "should have found create bank clause in statement")
-}
-
-func TestDB_CanBuildInsertStatementFromPlayer(t *testing.T) {
-	player := NewHedgeFund("hedge fund name")
-	statement := Insert{}.Statement(player)
-
-	assert(t, StringIncludes(statement, "insert into hedge_funds"), "should have found insert clause")
-	assert(t, StringIncludes(statement, "(name,dollars) values ('hedge fund name',100)"), "should have found values clause")
+	it("creates any players that were passed in")
+	assert(t, StringIncludes(statement, Insert{}.Statement(hedgeFund)))
+	assert(t, StringIncludes(statement, Insert{}.Statement(bank)))
 }
 
 // func TestDB_CanBuildUpdateStatementsFromTrade(t *testing.T) {
